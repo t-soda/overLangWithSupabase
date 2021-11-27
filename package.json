@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "@headlessui/react": "^1.4.2",
+    "next": "^12.0.4",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-error-boundary": "^3.1.4"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^1.28.0",
+    "@supabase/ui": "^0.35.0",
+    "@types/react": "^17.0.35",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.3.11",
+    "tailwindcss": "^2.2.19",
+    "typescript": "^4.5.2"
+  }
+}

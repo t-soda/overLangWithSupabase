@@ -1,0 +1,26 @@
+import { useCallback, useEffect, useState } from 'react';
+import { getAnyLangs } from 'src/libs/supabase';
+import { Lang } from 'src/pages/index';
+import Link from 'next/link';
+
+type LangListProps = {
+  langs: Lang[];
+};
+
+export const LangList = (props: LangListProps) => {
+  return (
+    <ul>
+      {props.langs.map((lang, key) => (
+        <li key={key}>
+          <Link href={`/${lang.user_id}`} passHref>
+            <a>{lang.user_id}</a>
+          </Link>
+          :{' '}
+          <Link href={`/l/${lang.body}`} passHref>
+            <a> {lang.body}</a>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+};
