@@ -36,7 +36,7 @@ export const getLangs = async (id: string | string[] | undefined) => {
 };
 
 export const getProfile = async () => {
-  const { data, error } = await client.from('profile').select('*');
+  const { data, error } = await client.from('profiles').select('*');
   if (!error && data) {
     return data[0];
   }
