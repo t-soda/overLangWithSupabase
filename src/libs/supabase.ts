@@ -34,3 +34,10 @@ export const getLangs = async (id: string | string[] | undefined) => {
   }
   return [];
 };
+
+export const getProfile = async () => {
+  const { data, error } = await client.from('profile').select('*');
+  if (!error && data) {
+    return data[0];
+  }
+};

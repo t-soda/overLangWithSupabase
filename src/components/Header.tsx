@@ -1,5 +1,7 @@
+import { Auth } from '@supabase/ui';
 import Link from 'next/link';
 import { client } from 'src/libs/supabase';
+import { EditProfile } from 'src/components/EditProfile';
 
 export const Header = () => {
   const getProfile = async () => {
@@ -11,6 +13,7 @@ export const Header = () => {
   };
 
   const userInfo = getProfile();
+  const { user } = Auth.useUser();
 
   return (
     <header>
@@ -19,7 +22,7 @@ export const Header = () => {
           <h1>Over Lang</h1>
         </a>
       </Link>
-      <span>{JSON.stringify(userInfo)}</span>
+      <EditProfile user={user} />
     </header>
   );
 };
