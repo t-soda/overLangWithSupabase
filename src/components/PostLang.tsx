@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { client } from 'src/libs/supabase';
 
 type PostLangProps = {
-  uuid: string;
+  user_id: number | null;
   getLangList: VoidFunction;
 };
 export const PostLang = (props: PostLangProps) => {
   const [body, setBody] = useState('');
-  const postLang = async (uuid: string, body: string) => {
+  const postLang = async (user_id: number | null, body: string) => {
     const { error } = await client
       .from('langs')
-      .insert({ user_id: uuid, body: body });
+      .insert({ user_id: user_id, body: body });
     if (!error) {
       props.getLangList();
       setBody('');
@@ -25,7 +25,7 @@ export const PostLang = (props: PostLangProps) => {
         type="text"
         onChange={(e) => setBody(e.target.value)}
       ></input>
-      <button onClick={() => postLang(props.uuid, body)}>つぶやく</button>
+      <button onClick={() => postLang(props.user_id, body)}>つぶやく</button>
     </div>
   );
 };

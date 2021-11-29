@@ -27,8 +27,8 @@ export const EditProfile = (props: Props) => {
     const userInfo = await getProfile();
     if (userInfo) {
       setId(userInfo.id);
-      setName(userInfo.name);
-      setEditName(userInfo.name);
+      setName(userInfo.user_name);
+      setEditName(userInfo.user_name);
       setIconExists(userInfo.icon);
       if (uid && userInfo.icon) {
         const { error, signedURL } = await client.storage
@@ -77,7 +77,7 @@ export const EditProfile = (props: Props) => {
       const { error } = await client.from('profiles').upsert({
         id: id,
         user_id: uid,
-        name: editName,
+        user_name: editName,
         icon: iconExists || iconChanged,
       });
       if (error) {
@@ -86,7 +86,7 @@ export const EditProfile = (props: Props) => {
     } else {
       const { error } = await client
         .from('profiles')
-        .insert({ user_id: uid, name: editName, icon: iconChanged });
+        .insert({ user_id: uid, user_name: editName, icon: iconChanged });
       if (error) {
         alert('Failed: Save Profile.');
       }

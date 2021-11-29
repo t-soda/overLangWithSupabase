@@ -3,6 +3,7 @@ import { Auth } from '@supabase/ui';
 import { getAnyLangs } from 'src/libs/supabase';
 import { LangList } from 'src/components/LangList';
 import { PostLang } from 'src/components/PostLang';
+import { useAppContext } from 'src/layout/AuthLayout';
 
 export type Lang = {
   id: number;
@@ -12,8 +13,10 @@ export type Lang = {
 };
 
 const App = () => {
+  const test = useAppContext();
   const { user } = Auth.useUser();
   const [langs, setLangs] = useState<Lang[]>([]);
+  console.log(test);
 
   const getLangList = useCallback(async () => {
     const data = await getAnyLangs();
@@ -28,7 +31,7 @@ const App = () => {
       {user && (
         <>
           <LangList langs={langs} />
-          <PostLang getLangList={getLangList} uuid={user.id} />
+          <PostLang getLangList={getLangList} user_id={test.id} />
         </>
       )}
     </>
