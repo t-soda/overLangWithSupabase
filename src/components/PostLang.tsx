@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { client } from 'src/libs/supabase';
+import { useState } from "react";
+import { client } from "src/libs/supabase";
 
 type PostLangProps = {
   user_id: number | null;
   getLangList: VoidFunction;
 };
 export const PostLang = (props: PostLangProps) => {
-  const [body, setBody] = useState('');
+  const [body, setBody] = useState("");
   const postLang = async (user_id: number | null, body: string) => {
     const { error } = await client
-      .from('langs')
+      .from("langs2")
       .insert({ user_id: user_id, body: body });
     if (!error) {
       props.getLangList();
-      setBody('');
+      setBody("");
       return;
     }
   };

@@ -1,15 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Auth } from '@supabase/ui';
-import { getAnyLangs } from 'src/libs/supabase';
-import { LangList } from 'src/components/LangList';
-import { PostLang } from 'src/components/PostLang';
-import { useAppContext } from 'src/layout/AuthLayout';
+import { useCallback, useEffect, useState } from "react";
+import { Auth } from "@supabase/ui";
+import { getAnyLangs } from "src/libs/supabase";
+import { LangList } from "src/components/LangList";
+import { PostLang } from "src/components/PostLang";
+import { useAppContext } from "src/layout/AuthLayout";
 
 export type Lang = {
   id: number;
   user_id: string;
   body: string;
   created_at: Date;
+  user_name: string;
+};
+
+export type Profiles = {
+  user_name: string;
 };
 
 const App = () => {

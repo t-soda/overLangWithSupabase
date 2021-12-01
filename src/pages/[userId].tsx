@@ -1,8 +1,8 @@
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
-import { LangList } from 'src/components/LangList';
-import { getLangs } from 'src/libs/supabase';
-import { Lang } from 'src/pages';
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
+import { LangList } from "src/components/LangList";
+import { getLangs } from "src/libs/supabase";
+import { Lang } from "src/pages";
 
 const UserPage = () => {
   const [id, setId] = useState<string | string[] | undefined>();

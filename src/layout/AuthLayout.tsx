@@ -1,10 +1,10 @@
-import { Auth } from '@supabase/ui';
-import { useCallback, useEffect, useState } from 'react';
-import { Footer } from 'src/components/Footer';
-import { Header } from 'src/components/Header';
-import { LayoutErrorBoundary } from 'src/layout/LayoutErrorBoundary';
-import { client, getProfile } from 'src/libs/supabase';
-import { createContext, useContext } from 'react';
+import { Auth } from "@supabase/ui";
+import { useCallback, useEffect, useState } from "react";
+import { Footer } from "src/components/Footer";
+import { Header } from "src/components/Header";
+import { LayoutErrorBoundary } from "src/layout/LayoutErrorBoundary";
+import { client, getProfile } from "src/libs/supabase";
+import { createContext, useContext } from "react";
 
 type Props = {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ type Props = {
 
 const AppContext = createContext<{ id: number | null; uid: string }>({
   id: null,
-  uid: '',
+  uid: "",
 });
 
 export function useAppContext() {
@@ -21,19 +21,17 @@ export function useAppContext() {
 
 export const AuthLayout = (props: Props) => {
   const [id, setId] = useState<number | null>(null);
-  const [uid, setUid] = useState<string>('');
-  const [name, setName] = useState<string>('User');
-  const [editName, setEditName] = useState<string>('User');
+  const [uid, setUid] = useState<string>("");
+  const [name, setName] = useState<string>("User");
+  const [editName, setEditName] = useState<string>("User");
   const [iconExists, setIconExists] = useState<boolean>(false);
   const [icon, setIcon] = useState<string | null>(null);
   const [previewIcon, setPreviewIcon] = useState<string | null>(null);
 
   const { user } = Auth.useUser();
   const getUserInfo = useCallback(async () => {
-    if (user) {
-      setUid(user.id);
-    }
-    const userInfo = await getProfile();
+    if (!user) return <div>loading</div>;
+    const userInfo = await getProfile(user.id);
     if (userInfo) {
       setId(userInfo.id);
       setName(userInfo.user_name);
@@ -41,8 +39,8 @@ export const AuthLayout = (props: Props) => {
       setIconExists(userInfo.icon);
       if (uid && userInfo.icon) {
         const { error, signedURL } = await client.storage
-          .from('avatar')
-          .createSignedUrl('private/' + uid + '.jpg', 600);
+          .from("avatar")
+          .createSignedUrl("private/" + uid + ".jpg", 600);
         if (!error) {
           setIcon(signedURL);
           setPreviewIcon(signedURL);
@@ -78,7 +76,7 @@ export const AuthLayout = (props: Props) => {
                   </h1>
                   <Auth
                     supabaseClient={client}
-                    providers={['google', 'twitter', 'github']}
+                    providers={["google", "twitter", "github"]}
                     socialColors={true}
                     magicLink
                   />

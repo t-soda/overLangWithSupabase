@@ -1,19 +1,19 @@
-import { Dialog, Transition } from '@headlessui/react';
-import { User } from '@supabase/gotrue-js';
-import { Button, IconSave, IconX } from '@supabase/ui';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import Avatar from 'react-avatar';
-import { client, getProfile } from 'src/libs/supabase';
+import { Dialog, Transition } from "@headlessui/react";
+import { User } from "@supabase/gotrue-js";
+import { Button, IconSave, IconX } from "@supabase/ui";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import Avatar from "react-avatar";
+import { client, getProfile } from "src/libs/supabase";
 
 type Props = {
-  user: User | null;
+  user: User;
 };
 
 export const EditProfile = (props: Props) => {
   const [id, setId] = useState<number | null>(null);
-  const [uid, setUid] = useState<string>('');
-  const [name, setName] = useState<string>('User');
-  const [editName, setEditName] = useState<string>('User');
+  const [uid, setUid] = useState<string>("");
+  const [name, setName] = useState<string>("User");
+  const [editName, setEditName] = useState<string>("User");
   const [iconExists, setIconExists] = useState<boolean>(false);
   const [icon, setIcon] = useState<string | null>(null);
   const [previewIcon, setPreviewIcon] = useState<string | null>(null);
@@ -21,10 +21,11 @@ export const EditProfile = (props: Props) => {
   const iconInputRef = useRef<HTMLInputElement | null>(null);
 
   const getUserInfo = useCallback(async () => {
+    if (!props?.user?.id) return <div>loading..</div>;
     if (props.user) {
       setUid(props.user.id);
     }
-    const userInfo = await getProfile();
+    const userInfo = await getProfile(props.user.id);
     if (userInfo) {
       setId(userInfo.id);
       setName(userInfo.user_name);
@@ -32,8 +33,8 @@ export const EditProfile = (props: Props) => {
       setIconExists(userInfo.icon);
       if (uid && userInfo.icon) {
         const { error, signedURL } = await client.storage
-          .from('avatar')
-          .createSignedUrl('private/' + uid + '.jpg', 600);
+          .from("avatar")
+          .createSignedUrl("private/" + uid + ".jpg", 600);
         if (!error) {
           setIcon(signedURL);
           setPreviewIcon(signedURL);
@@ -57,38 +58,38 @@ export const EditProfile = (props: Props) => {
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (editName == '') {
-      alert('Input name.');
+    if (editName == "") {
+      alert("Input name.");
       return;
     }
     let iconChanged = false;
     if (previewIconFile) {
-      const filename = uid + '.jpg';
+      const filename = uid + ".jpg";
       const { error } = await client.storage
-        .from('avatar')
-        .upload('private/' + filename, previewIconFile, { upsert: true });
+        .from("avatar")
+        .upload("private/" + filename, previewIconFile, { upsert: true });
       if (error) {
-        alert('Failed: Upload Icon.');
+        alert("Failed: Upload Icon.");
       } else {
         iconChanged = true;
       }
     }
     if (id) {
-      const { error } = await client.from('profiles').upsert({
+      const { error } = await client.from("profiles").upsert({
         id: id,
         user_id: uid,
         user_name: editName,
         icon: iconExists || iconChanged,
       });
       if (error) {
-        alert('Failed: Update Profile.');
+        alert("Failed: Update Profile.");
       }
     } else {
       const { error } = await client
-        .from('profiles')
+        .from("profiles")
         .insert({ user_id: uid, user_name: editName, icon: iconChanged });
       if (error) {
-        alert('Failed: Save Profile.');
+        alert("Failed: Save Profile.");
       }
     }
     getUserInfo();
@@ -100,7 +101,7 @@ export const EditProfile = (props: Props) => {
       if (!e.target.files?.length) return;
       setPreviewIconFile(e.target.files[0]);
       setPreviewIcon(URL.createObjectURL(e.target.files[0]));
-      e.currentTarget.value = '';
+      e.currentTarget.value = "";
     },
     []
   );
@@ -122,7 +123,7 @@ export const EditProfile = (props: Props) => {
           color="#bbbbbb"
           alt="Icon"
           round
-          src={icon ? icon : ''}
+          src={icon ? icon : ""}
         />
         <a className="text-xl pt-1">{name}</a>
       </div>
@@ -172,7 +173,7 @@ export const EditProfile = (props: Props) => {
                       color="#bbbbbb"
                       alt="Icon"
                       round
-                      src={previewIcon ? previewIcon : ''}
+                      src={previewIcon ? previewIcon : ""}
                       onClick={handleClickChangeIcon}
                     />
                   </div>
