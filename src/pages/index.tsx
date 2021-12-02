@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { Auth } from "@supabase/ui";
-import { getAnyLangs } from "src/libs/supabase";
+import { getAnyLangs, getMyLangs } from "src/libs/supabase";
 import { LangList } from "src/components/LangList";
 import { PostLang } from "src/components/PostLang";
-import { useAppContext } from "src/layout/AuthLayout";
 
 export type Lang = {
   id: number;
-  user_id: string;
+  users_id: string;
+  name: string;
   body: string;
   created_at: Date;
-  user_name: string;
 };
 
 export type Profiles = {
@@ -18,25 +17,37 @@ export type Profiles = {
 };
 
 const App = () => {
-  const test = useAppContext();
+  const [isAny, setIsAny] = useState<boolean>();
   const { user } = Auth.useUser();
   const [langs, setLangs] = useState<Lang[]>([]);
-  console.log(test);
 
-  const getLangList = useCallback(async () => {
+  const getMyLangList = async () => {
+    setIsAny(false);
+    const data = await getMyLangs(user?.id);
+    setLangs(data);
+  };
+
+  const getAnyLangList = async () => {
+    setIsAny(true);
     const data = await getAnyLangs();
     setLangs(data);
-  }, [setLangs]);
+  };
 
   useEffect(() => {
-    getLangList();
-  }, [getLangList]);
+    getAnyLangList();
+  }, []);
+
   return (
     <>
       {user && (
         <>
+          <button onClick={() => getMyLangList()}>&#x1f3e0;</button>
+          <button onClick={() => getAnyLangList()}>Any</button>
           <LangList langs={langs} />
-          <PostLang getLangList={getLangList} user_id={test.id} />
+          <PostLang
+            getLangList={isAny ? getAnyLangList : getMyLangList}
+            users_id={user.id}
+          />
         </>
       )}
     </>

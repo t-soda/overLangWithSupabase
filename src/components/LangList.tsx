@@ -12,8 +12,8 @@ export const LangList = (props: LangListProps) => {
     <ul>
       {props.langs.map((lang, key) => (
         <li key={key}>
-          <Link href={`/${lang.user_name}`} passHref>
-            <a>{lang.user_name}</a>
+          <Link href={`/${lang.name}`} passHref>
+            <a>{lang.name}</a>
           </Link>
           :{" "}
           <Link href={`/l/${lang.id}`} passHref>

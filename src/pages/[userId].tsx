@@ -1,14 +1,17 @@
-import { useRouter } from 'next/router';
-import { FC, useCallback, useEffect, useState } from 'react';
-import { LangList } from 'src/components/LangList';
-import { client, getLangs, getProfile, getUserId } from 'src/libs/supabase';
-import { Lang } from 'src/pages';
+import { useRouter } from "next/router";
+import { FC, useCallback, useEffect, useState } from "react";
+import { LangList } from "src/components/LangList";
+import { client, getLangs, getProfile, getUserId } from "src/libs/supabase";
+import { Lang } from "src/pages";
+import { Follow } from "src/components/Follow";
+import { Auth } from "@supabase/ui";
 
 const UserPage = () => {
   const [id, setId] = useState<string | string[] | undefined>();
-  const [followingId, setFollowingId] = useState();
-  const [followedId, setFollowedId] = useState();
+  const [followingId, setFollowingId] = useState<number>(0);
+  const [followedId, setFollowedId] = useState<number>(0);
   const [langs, setLangs] = useState<Lang[]>([]);
+  const { user } = Auth.useUser();
   const location = useRouter();
   const getLangList = async () => {
     const data = await getLangs(location.query.userId);
@@ -17,7 +20,9 @@ const UserPage = () => {
 
   const getUserInfo = async () => {
     const data = await getUserId(location.query.userId);
-    setFollowedId(data.id);
+    if (data) {
+      setFollowedId(data.id);
+    }
   };
 
   useEffect(() => {
@@ -25,26 +30,9 @@ const UserPage = () => {
     getUserInfo();
   }, [location.isReady]);
 
-  type FollowProps = {
-    following_id: number;
-    followed_id: number;
-  };
-
-  const Follow: FC<FollowProps> = (props) => {
-    const following = async () => {
-      const { error } = await client
-        .from('follows')
-        .insert({ following: props.following_id, followed: props.followed_id });
-      if (error) {
-        alert('Failed: Save Profile.');
-      }
-    };
-    return <button onClick={() => following()}>フォローする</button>;
-  };
-
   return (
     <div>
-      <Follow following_id={1} followed_id={2} />
+      <Follow followingId={user.id} followedId={followedId} />
       <LangList langs={langs} />
     </div>
   );

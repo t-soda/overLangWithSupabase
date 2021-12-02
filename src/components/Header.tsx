@@ -1,10 +1,9 @@
-import { Auth } from '@supabase/ui';
-import Link from 'next/link';
-import { EditProfile } from 'src/components/EditProfile';
+import { Auth } from "@supabase/ui";
+import Link from "next/link";
+import { EditProfile } from "src/components/EditProfile";
 
 export const Header = () => {
   const { user } = Auth.useUser();
-  console.log(user);
 
   return (
     <header>
