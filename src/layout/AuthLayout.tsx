@@ -25,12 +25,10 @@ export const AuthLayout = (props: Props) => {
             ) : (
               <div className="flex justify-center pt-8">
                 <div className="w-full sm:w-96">
-                  <h1 className="mb-4 text-2xl font-bold">
-                    OverLangで世界を広げる？
-                  </h1>
+                  <h1 className="mb-4 text-2xl font-bold">Over？</h1>
                   <Auth
                     supabaseClient={client}
-                    providers={["google", "twitter", "github"]}
+                    // providers={["google", "twitter", "github"]}
                     socialColors={true}
                     magicLink
                   />

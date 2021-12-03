@@ -2,15 +2,15 @@ import { FC, useCallback, useEffect, useState } from "react";
 import { client, getIsFollowed } from "src/libs/supabase";
 
 type FollowProps = {
-  followingId: number;
-  followedId: number;
+  followId: string;
+  followedId: string;
 };
 
 export const Follow: FC<FollowProps> = (props) => {
   const [isFollowed, setIsFollowed] = useState<boolean>();
 
   const checkIsFollowed = async () => {
-    const data = await getIsFollowed(props.followingId, props.followedId);
+    const data = await getIsFollowed(props.followId, props.followedId);
     if (data) {
       setIsFollowed(true);
     } else {
@@ -23,9 +23,10 @@ export const Follow: FC<FollowProps> = (props) => {
   }, [props]);
 
   const follow = async () => {
-    const { error } = await client
-      .from("follows")
-      .insert({ following: props.followingId, followed: props.followedId });
+    const { error } = await client.from("follows").insert({
+      follow_users_id: props.followId,
+      followed_users_id: props.followedId,
+    });
     if (error) {
       alert("Failed: follow.");
     }
@@ -33,16 +34,16 @@ export const Follow: FC<FollowProps> = (props) => {
   };
 
   const unFollow = async () => {
-    const { error } = await client
-      .from("follows")
-      .delete()
-      .match({ following: props.followingId, followed: props.followedId });
+    const { error } = await client.from("follows").delete().match({
+      follow_users_id: props.followId,
+      followed_users_id: props.followedId,
+    });
     if (error) {
       alert("Failed: unfollow.");
     }
     checkIsFollowed();
   };
-  if (!props.followingId) return <span>loading...</span>;
+  if (!props.followId) return <span>loading...</span>;
   return (
     <>
       {!isFollowed ? (
