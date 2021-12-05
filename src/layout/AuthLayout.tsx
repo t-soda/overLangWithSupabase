@@ -1,9 +1,9 @@
-import { Auth } from "@supabase/ui";
-import { useCallback, useEffect, useState } from "react";
-import { Footer } from "src/components/Footer";
-import { Header } from "src/components/Header";
-import { LayoutErrorBoundary } from "src/layout/LayoutErrorBoundary";
-import { client, getProfile } from "src/libs/supabase";
+import { Auth } from '@supabase/ui';
+import { useCallback, useEffect, useState } from 'react';
+import { Footer } from 'src/components/Footer';
+import { Header } from 'src/components/Header';
+import { LayoutErrorBoundary } from 'src/layout/LayoutErrorBoundary';
+import { client, getProfile } from 'src/libs/supabase';
 
 type Props = {
   children: React.ReactNode;

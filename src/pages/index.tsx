@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { Auth } from "@supabase/ui";
-import { getEveryLangs, getFollows, getMyLangs } from "src/libs/supabase";
-import { LangList } from "src/components/LangList";
-import { PostLang } from "src/components/PostLang";
+import { Auth } from '@supabase/ui';
+import { PostLang } from 'src/components/PostLang';
+import { MyLangList } from 'src/components/MyLangList';
+import { EveryLangList } from 'src/components/EveryLangList';
+import { useState } from 'react';
 
 export type Lang = {
   id: number;
@@ -17,50 +17,28 @@ export type Profiles = {
 };
 
 const App = () => {
-  const [isAny, setIsAny] = useState<boolean>();
   const { user } = Auth.useUser();
-  const [langs, setLangs] = useState<Lang[] | any[]>([]);
-  const [page, setPage] = useState<number>(0);
+  const [switchLangs, setSwitchLangs] = useState<string>('MyLangs');
 
-  const getMyLangList = async () => {
-    setIsAny(false);
-    if (user) {
-      const follows = await getFollows(user.id);
-      const data = await getMyLangs(user.id, follows, page);
-      console.log({ fetch: data });
-      const newLangs = [...langs, ...data];
-      setLangs(newLangs);
-      console.log({ langs: langs });
+  const RenderLangList = () => {
+    switch (switchLangs) {
+      case 'MyLangs':
+        return <MyLangList user={user!} />;
+      case 'EveryLangs':
+        return <EveryLangList user={user!} />;
+      default:
+        return <div>エラーが発生しました。</div>;
     }
   };
-
-  const getAnyLangList = async () => {
-    setIsAny(true);
-    const data = await getEveryLangs(page);
-    setLangs(data);
-  };
-
-  const getMore = () => {
-    setPage((page) => page + 1);
-    getMyLangList();
-  };
-
-  useEffect(() => {
-    getMyLangList();
-  }, []);
 
   return (
     <>
       {user && (
         <>
-          <button onClick={() => getMyLangList()}>&#x1f3e0;</button>
-          <button onClick={() => getAnyLangList()}>Any</button>
-          <LangList langs={langs} />
-          <button onClick={() => getMore()}>show more...</button>
-          <PostLang
-            getLangList={isAny ? getAnyLangList : getMyLangList}
-            users_id={user.id}
-          />
+          <button onClick={() => setSwitchLangs('MyLangs')}>[My]</button>
+          <button onClick={() => setSwitchLangs('EveryLangs')}>[Every]</button>
+          <PostLang users_id={user.id} />
+          {user ? <RenderLangList /> : <div>loading...</div>}
         </>
       )}
     </>
