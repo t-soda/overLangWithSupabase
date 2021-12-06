@@ -1,3 +1,4 @@
+import { Disclosure } from "@headlessui/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { LangList } from "src/components/LangList";
@@ -16,7 +17,23 @@ const UserPage = () => {
     getLangList();
   }, [location.isReady]);
 
-  return <div>{lang?.body}</div>;
+  return (
+    <div>
+      <p>{lang?.translated_body}</p>
+      <Disclosure>
+        {({ open }) => (
+          <>
+            <Disclosure.Button className="py-2">
+              {open ? "原文を非表示" : "原文を表示"}
+            </Disclosure.Button>
+            <Disclosure.Panel className="text-gray-500">
+              {lang?.body}
+            </Disclosure.Panel>
+          </>
+        )}
+      </Disclosure>
+    </div>
+  );
 };
 
 export default UserPage;
