@@ -1,12 +1,14 @@
 import {
+  closestCorners,
   DndContext,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import {
-  horizontalListSortingStrategy,
+  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
@@ -14,6 +16,7 @@ import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
 import router, { useRouter } from "next/router";
 import { FC, useCallback, useEffect, useState } from "react";
+import { Item } from "src/components/Item";
 import { LangList } from "src/components/LangList";
 import { SortableItem } from "src/components/SortableItem";
 import { getLang } from "src/libs/supabase";
@@ -25,7 +28,10 @@ interface RenderWordProps {
 }
 
 const UserPage = () => {
+  const [items, setItems] = useState<string[]>([]);
   const [lang, setLang] = useState<Lang>();
+  const [activeId, setActiveId] = useState(null);
+
   const location = useRouter();
   const getLangList = async () => {
     const data = await getLang(location.query.langId);
@@ -34,13 +40,36 @@ const UserPage = () => {
 
   useEffect(() => {
     getLangList();
-  }, [location.isReady]);
+    if (lang) {
+      setItems(lang?.translated_body.split(" ").map((value) => value));
+    }
+  }, [location.isReady, lang]);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+  function handleDragStart(event: any) {
+    const { active } = event;
+
+    setActiveId(active.id);
+  }
+
+  function handleDragEnd(event: any) {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.indexOf(active.id);
+        const newIndex = items.indexOf(over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+
+    setActiveId(null);
+  }
 
   return (
     <div>
@@ -60,16 +89,21 @@ const UserPage = () => {
 
       {lang && (
         <div className="flex">
-          <DndContext sensors={sensors}>
-            <SortableContext
-              items={lang?.translated_body.split(" ").map((word) => word)}
-            >
-              {lang?.translated_body
-                .split(" ")
-                .map((word: string, key: number) => {
-                  return <SortableItem value={word} key={key} />;
-                })}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragEnd}
+          >
+            <SortableContext items={items}>
+              {items.map((word: string) => {
+                return <SortableItem id={word} key={word} />;
+              })}
             </SortableContext>
+            <DragOverlay>
+              {activeId ? <Item id={activeId} /> : null}
+            </DragOverlay>
           </DndContext>
         </div>
       )}
