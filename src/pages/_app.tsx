@@ -1,8 +1,8 @@
-import type { AppProps } from 'next/app';
-import { Auth } from '@supabase/ui';
-import { AuthLayout } from 'src/layout/AuthLayout';
-import { client } from 'src/libs/supabase';
-import 'tailwindcss/tailwind.css';
+import type { AppProps } from "next/app";
+import { Auth } from "@supabase/ui";
+import { AuthLayout } from "src/layout/AuthLayout";
+import { client } from "src/libs/supabase";
+import "tailwindcss/tailwind.css";
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (

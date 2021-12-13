@@ -16,8 +16,6 @@ export const Item = forwardRef(
         {...props}
       >
         {props.id}
-        <br />
-        {description}
       </div>
     );
   }

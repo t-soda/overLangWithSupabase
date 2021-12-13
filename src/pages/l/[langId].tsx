@@ -35,15 +35,20 @@ const UserPage = () => {
   const location = useRouter();
   const getLangList = async () => {
     const data = await getLang(location.query.langId);
+    setItems(
+      shuffleArray(data?.translated_body.split(" ").map((value: any) => value))
+    );
     setLang(data);
   };
 
   useEffect(() => {
     getLangList();
-    if (lang) {
-      setItems(lang?.translated_body.split(" ").map((value) => value));
-    }
-  }, [location.isReady, lang]);
+  }, [location.isReady]);
+
+  const shuffleArray = (inputArray: string[]) => {
+    return inputArray.sort(() => Math.random() - 0.5);
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -57,6 +62,8 @@ const UserPage = () => {
   }
 
   function handleDragEnd(event: any) {
+    console.log(items.join(""));
+    console.log(lang?.translated_body.replace(/\s+/g, ""));
     const { active, over } = event;
 
     if (active.id !== over.id) {
@@ -69,6 +76,21 @@ const UserPage = () => {
     }
 
     setActiveId(null);
+  }
+
+  function handleDragOver(event: any) {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.findIndex((i) => i === active.id);
+        const newIndex = items.findIndex((i) => i === over.id);
+        console.log(active);
+        console.log(over);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   }
 
   return (
@@ -86,8 +108,11 @@ const UserPage = () => {
           </>
         )}
       </Disclosure>
+      {lang?.translated_body.replace(/\s+/g, "") === items.join("") && (
+        <span>OK</span>
+      )}
 
-      {lang && (
+      {items && (
         <div className="flex">
           <DndContext
             sensors={sensors}
@@ -95,6 +120,7 @@ const UserPage = () => {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
             onDragCancel={handleDragEnd}
+            onDragOver={handleDragOver}
           >
             <SortableContext items={items}>
               {items.map((word: string) => {
