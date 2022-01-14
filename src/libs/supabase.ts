@@ -13,7 +13,7 @@ if (!SUPABASE_KEY) {
 
 export const client = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-export const getEveryLangs = async (page: number) => {
+export const getAnyLangs = async (page: number) => {
   const { data, error } = await client
     .from("langs_with_name")
     .select("*")
@@ -111,4 +111,21 @@ export const getFollows = async (followId: string) => {
     return follows;
   }
   return [];
+};
+
+export const getFinished = async (
+  usersId: string,
+  langsId: string | string[] | undefined
+) => {
+  console.log(usersId);
+  console.log(langsId);
+  const { data, error } = await client
+    .from("finishes")
+    .select("*")
+    .eq("users_id", usersId)
+    .eq("langs_id", langsId)
+    .single();
+  if (!error && data) {
+    return data;
+  }
 };

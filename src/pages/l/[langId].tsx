@@ -20,8 +20,10 @@ import { FC, useCallback, useEffect, useState } from "react";
 import { Item } from "src/components/Item";
 import { LangList } from "src/components/LangList";
 import { SortableItem } from "src/components/SortableItem";
-import { getLang } from "src/libs/supabase";
+import { getLang, getFinished } from "src/libs/supabase";
 import { Lang } from "src/pages";
+import { client } from "src/libs/supabase";
+import { Auth } from "@supabase/ui";
 
 interface RenderWordProps {
   word: string;
@@ -29,30 +31,66 @@ interface RenderWordProps {
 }
 
 const UserPage = () => {
+  const { user } = Auth.useUser();
   const [items, setItems] = useState<string[]>([]);
+  const [translatedLang, setTranslatedLang] = useState<string>("");
   const [lang, setLang] = useState<Lang>();
   const [activeId, setActiveId] = useState(null);
+  const [isFinished, setIsFinished] = useState<boolean>(false);
+  const [finishedDate, setFinishedDate] = useState<string>("");
 
   const location = useRouter();
-  const getLangList = async () => {};
 
   useEffect(() => {
     (async () => {
-      const data = await getLang(location.query.langId);
+      const langData = await getLang(location.query.langId);
+      const finishedData = await getFinished(user!.id, location.query.langId);
       const translateAPI =
         "https://script.google.com/macros/s/AKfycbxdObsyAVIBl_viwOXd2Pqda_uBcL5edZNWTCz4T0yFIDT8hnJ00hs6uIdmFzl6CbP9/exec";
-      const response = await axios.get(`${translateAPI}?word=${data?.body}`);
+      const response = await axios.get(
+        `${translateAPI}?word=${langData?.body}`
+      );
       console.log(response);
+      setTranslatedLang(response.data.result);
       setItems(
         shuffleArray(response.data.result.split(" ").map((value: any) => value))
       );
-      setLang(data);
+      setLang(langData);
+      setFinishedDate(finishedData.created_at);
     })();
-    getLangList();
   }, [location.isReady]);
+
+  useEffect(() => {
+    checkLang();
+  }, [items]);
 
   const shuffleArray = (inputArray: string[]) => {
     return inputArray.sort(() => Math.random() - 0.5);
+  };
+
+  const checkLang = () => {
+    if (translatedLang == "" || items.join("") == "") return;
+    console.log(translatedLang);
+    console.log(items.join(""));
+    if (translatedLang.replace(/\s+/g, "") === items.join("")) {
+      setIsFinished(true);
+      if (!finishedDate) {
+        postFinished(user!.id, location.query.langId);
+      }
+    }
+  };
+
+  const postFinished = async (
+    users_id: string,
+    langId: string | string[] | undefined
+  ) => {
+    const { error } = await client.from("finishes").insert({
+      users_id: users_id,
+      langs_id: langId,
+    });
+    if (!error) {
+      return;
+    }
   };
 
   const sensors = useSensors(
@@ -61,6 +99,7 @@ const UserPage = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
   function handleDragStart(event: any) {
     const { active } = event;
 
@@ -78,7 +117,6 @@ const UserPage = () => {
         return arrayMove(items, oldIndex, newIndex);
       });
     }
-
     setActiveId(null);
   }
 
@@ -112,9 +150,8 @@ const UserPage = () => {
           </>
         )}
       </Disclosure>
-      {lang?.translated_body.replace(/\s+/g, "") === items.join("") && (
-        <span>OK</span>
-      )}
+      {isFinished && <p>OK</p>}
+      {finishedDate && <p>クリア済:{finishedDate}</p>}
 
       {items && (
         <div className="flex">

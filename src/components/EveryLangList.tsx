@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { getEveryLangs } from 'src/libs/supabase';
-import { Lang } from 'src/pages';
-import { LangList } from 'src/components/LangList';
-import { User } from '@supabase/gotrue-js';
+import React, { useEffect, useState } from "react";
+import { getAnyLangs } from "src/libs/supabase";
+import { Lang } from "src/pages";
+import { LangList } from "src/components/LangList";
+import { User } from "@supabase/gotrue-js";
 
 export const EveryLangList = ({ user }: { user: User }) => {
   const [langs, setLangs] = useState<Lang[] | any[]>([]);
@@ -10,7 +10,7 @@ export const EveryLangList = ({ user }: { user: User }) => {
 
   const getEveryLangList = async () => {
     if (user) {
-      const data = await getEveryLangs(page);
+      const data = await getAnyLangs(page);
       const newLangs = [...langs, ...data];
       setLangs(newLangs);
       console.log({ langs: langs });

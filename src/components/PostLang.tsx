@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState } from "react";
 import { client } from "src/libs/supabase";
 
@@ -8,16 +7,10 @@ type PostLangProps = {
 export const PostLang = (props: PostLangProps) => {
   const [body, setBody] = useState("");
   const postLang = async (users_id: string, body: string) => {
-    const translateAPI =
-      "https://script.google.com/macros/s/AKfycbxdObsyAVIBl_viwOXd2Pqda_uBcL5edZNWTCz4T0yFIDT8hnJ00hs6uIdmFzl6CbP9/exec";
-    const response = await axios.get(`${translateAPI}?word=${body}`);
-    const { error } = await client
-      .from("langs")
-      .insert({
-        users_id: users_id,
-        body: body,
-        translated_body: response.data.result,
-      });
+    const { error } = await client.from("langs").insert({
+      users_id: users_id,
+      body: body,
+    });
     if (!error) {
       setBody("");
       return;
