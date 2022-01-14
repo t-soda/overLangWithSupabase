@@ -13,6 +13,7 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { Disclosure } from "@headlessui/react";
+import axios from "axios";
 import Link from "next/link";
 import router, { useRouter } from "next/router";
 import { FC, useCallback, useEffect, useState } from "react";
@@ -33,15 +34,20 @@ const UserPage = () => {
   const [activeId, setActiveId] = useState(null);
 
   const location = useRouter();
-  const getLangList = async () => {
-    const data = await getLang(location.query.langId);
-    setItems(
-      shuffleArray(data?.translated_body.split(" ").map((value: any) => value))
-    );
-    setLang(data);
-  };
+  const getLangList = async () => {};
 
   useEffect(() => {
+    (async () => {
+      const data = await getLang(location.query.langId);
+      const translateAPI =
+        "https://script.google.com/macros/s/AKfycbxdObsyAVIBl_viwOXd2Pqda_uBcL5edZNWTCz4T0yFIDT8hnJ00hs6uIdmFzl6CbP9/exec";
+      const response = await axios.get(`${translateAPI}?word=${data?.body}`);
+      console.log(response);
+      setItems(
+        shuffleArray(response.data.result.split(" ").map((value: any) => value))
+      );
+      setLang(data);
+    })();
     getLangList();
   }, [location.isReady]);
 
@@ -62,8 +68,6 @@ const UserPage = () => {
   }
 
   function handleDragEnd(event: any) {
-    console.log(items.join(""));
-    console.log(lang?.translated_body.replace(/\s+/g, ""));
     const { active, over } = event;
 
     if (active.id !== over.id) {
@@ -95,7 +99,7 @@ const UserPage = () => {
 
   return (
     <div>
-      <p>{lang?.translated_body}</p>
+      <p>{lang?.body}</p>
       <Disclosure>
         {({ open }) => (
           <>

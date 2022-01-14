@@ -16,7 +16,7 @@ export const LangList = (props: LangListProps) => {
           </Link>
           :{" "}
           <Link href={`/l/${lang.id}`} passHref>
-            <a> {lang.translated_body}</a>
+            <a> {lang.body}</a>
           </Link>
         </li>
       ))}

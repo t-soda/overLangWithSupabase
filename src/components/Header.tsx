@@ -12,7 +12,7 @@ export const Header = () => {
           <h1>Over Lang</h1>
         </a>
       </Link>
-      <EditProfile user={user} />
+      {/* <EditProfile user={user} /> */}
     </header>
   );
 };
